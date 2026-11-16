@@ -10,7 +10,7 @@ Vorsorge, Impfungen, Zyklus und Gesundheitsempfehlungen in einem Kalender.
 - **Installierbar (PWA)** – Manifest, Icons und Service Worker (`public/sw.js`) für Offline-Nutzung
 - **Erinnerungen** – lokale Benachrichtigungen ohne Server (`src/lib/reminders.ts`) und Kalender-Export als `.ics` (`src/lib/ics.ts`)
 
-> Stand der medizinischen Inhalte in `src/data/` (November 2026): Alle Einträge wurden per Websuche mit STIKO-, G-BA-, WHO- und DGE-Angaben abgeglichen – allerdings nur anhand von Suchergebnis-Zusammenfassungen, **nicht anhand der Originaldokumente**. Die `sourceUrl`-Links wurden nicht einzeln geöffnet. Vor einem öffentlichen Einsatz ist eine fachliche Prüfung nötig.
+> Stand der medizinischen Inhalte in `src/data/` (November 2026): Impfungen sind am STIKO-Impfkalender 2026 (RKI, Epid. Bull. 4/2026 und 28/2026) geprüft, Untersuchungen an Richtlinien und Versicherteninformationen von G-BA, BMG und gesund.bund.de, Empfehlungen an WHO, DGE und gesund.bund.de. Einzelne Punkte (z. B. Zahnstein-Intervall, freiwillige Kassenleistungen U10/U11/J2, Zyklus-Tipps, vier Alltagstipps) sind nicht an einem Originaldokument belegt. Die Angaben ersetzen keine ärztliche Beratung.
 
 ## Entwicklung
 
