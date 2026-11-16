@@ -52,7 +52,13 @@ export default function RecsView({ profile, today }: ViewProps) {
               <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${recMeta[r.category].cls}`}>
                 <Icon name={recIcon[r.category]} size={14} /> {recMeta[r.category].label}
               </span>
-              <span className="text-xs text-muted">{r.source}</span>
+              {r.sourceUrl ? (
+                <a href={r.sourceUrl} target="_blank" rel="noreferrer" className="text-xs text-muted underline underline-offset-2">
+                  {r.source}
+                </a>
+              ) : (
+                <span className="text-xs text-muted">{r.source}</span>
+              )}
             </div>
             {r.metric && <p className="font-display mt-4 text-3xl text-forest">{r.metric}</p>}
             <h2 className={`font-semibold ${r.metric ? "mt-1" : "mt-4 text-lg"}`}>{r.title}</h2>

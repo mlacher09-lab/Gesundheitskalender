@@ -102,7 +102,7 @@ export const recommendations: Recommendation[] = [
     ageFrom: 0,
     ageTo: 5,
     sex: "all",
-    source: "G-BA / STIKO",
+    source: "Allgemeine Gesundheitsinformation (nicht einzeln belegt)",
   },
 
   // ───────────── 6–17 Jahre ─────────────
