@@ -1,6 +1,13 @@
+import { requiresById, riskItems, type RiskKey } from "@/data/risiko";
 import { careItems, type CareCategory, type CareItem } from "@/data/vorsorge";
 import { addYears, diffDays, parse } from "./date";
-import type { Profile } from "./store";
+import { isRiskActive, type Profile } from "./store";
+
+/** Alle Stammdaten: Standardeinträge plus Einträge, die nur bei Risikofaktoren gelten. */
+export const allItems: (CareItem & { requires?: RiskKey })[] = [
+  ...careItems.map((i) => ({ ...i, requires: requiresById[i.id] })),
+  ...riskItems,
+];
 
 export type CareStatus = "due" | "soon" | "ok" | "later" | "done";
 
@@ -50,8 +57,9 @@ export function careEntries(
   const birth = parse(profile.birthDate);
   const out: CareEntry[] = [];
 
-  for (const item of careItems) {
+  for (const item of allItems) {
     if (skipped.includes(item.id)) continue;
+    if (item.requires && !isRiskActive(profile.risk, item.requires)) continue;
     if (item.sex !== "all" && profile.sex !== "all" && item.sex !== profile.sex)
       continue;
 

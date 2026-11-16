@@ -9,7 +9,7 @@ import { Button, Field, Icon, Sheet } from "./ui";
 export function statusPill(e: CareEntry, today: Date) {
   switch (e.status) {
     case "due":
-      return { text: e.dueDate ? "Fällig" : "Offen", cls: "bg-coral text-white" };
+      return { text: e.dueDate ? "Fällig" : "Offen", cls: "bg-coral text-onaccent" };
     case "soon":
       return { text: relative(e.dueDate!, today), cls: "bg-sun-soft text-sun" };
     case "ok":
@@ -69,7 +69,15 @@ export function CareSheet({
   const [planDate, setPlanDate] = useState("");
 
   const markDone = () => {
-    update((s) => ({ ...s, done: { ...s.done, [item.id]: doneDate } }));
+    update((s) => ({
+      ...s,
+      done: { ...s.done, [item.id]: doneDate },
+      // Impfungen landen zusätzlich im Impfpass
+      vaccLog:
+        item.category === "impfung" && !s.vaccLog.some((v) => v.itemId === item.id && v.date === doneDate)
+          ? [...s.vaccLog, { id: uid(), itemId: item.id, name: item.title, date: doneDate }]
+          : s.vaccLog,
+    }));
     onClose();
   };
   const clearDone = () => {

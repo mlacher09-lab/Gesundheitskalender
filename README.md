@@ -7,6 +7,13 @@ Vorsorge, Impfungen, Zyklus und Gesundheitsempfehlungen in einem Kalender.
 - **Empfehlungen** – Bewegung, Ernährung, Schlaf, Mental nach Alter (`src/data/empfehlungen.ts`)
 - **Datenschutz** – alle Daten liegen ausschließlich im `localStorage` des Browsers
 
+- **Familienprofile** – mehrere Personen mit eigenem Plan, Impfpass und Kalender
+- **Risikofaktoren** – Rauchen, Schwangerschaft, chronische Erkrankung, familiäres Risiko, FSME-Gebiet passen den Plan an (`src/data/risiko.ts`)
+- **Impfpass** – eingetragene Impfungen mit Countdown bis zur Auffrischung
+- **Medikamentenplan**, **Messwerte-Tagebuch** (Blutdruck, Gewicht, Labor mit Verlauf), **Bonusheft**
+- **Praxen** und **Terminvorbereitung** (Fragen, Mitbringen, Notizen danach)
+- **Reiseimpfungen** nach Zielland (`src/data/reise.ts`, aus den STIKO/DTG-Ländertabellen des RKI, Epid. Bull. 27/2026)
+- **Dunkles Design** – automatisch oder fest wählbar
 - **Installierbar (PWA)** – Manifest, Icons und Service Worker (`public/sw.js`) für Offline-Nutzung
 - **Erinnerungen** – lokale Benachrichtigungen ohne Server (`src/lib/reminders.ts`) und Kalender-Export als `.ics` (`src/lib/ics.ts`)
 

@@ -5,14 +5,29 @@ import { cyclePhaseTips, recommendations } from "@/data/empfehlungen";
 import { careEntries, type CareEntry } from "@/lib/care";
 import { cycleInfo } from "@/lib/cycle";
 import { addDays, ageAt, diffDays, fmtLong, fmtShort, iso, parse, relative } from "@/lib/date";
+import { update } from "@/lib/store";
 import type { ViewProps } from "./App";
 import { CareRow, CareSheet } from "./CareParts";
 import CycleRing from "./CycleRing";
 import { recIcon } from "./RecsView";
+import VisitSheet from "./VisitSheet";
 import { Card, Icon, SectionTitle } from "./ui";
 
-export default function Today({ state, profile, today, go }: ViewProps) {
+export default function Today({ app, state, profile, today, go }: ViewProps) {
   const [open, setOpen] = useState<CareEntry | null>(null);
+  const [visitId, setVisitId] = useState<string | null>(null);
+  const visit = state.appointments.find((a) => a.id === visitId);
+  const todayIso = iso(today);
+  const doses = state.meds
+    .filter((m) => m.active && (!m.until || m.until >= todayIso))
+    .flatMap((m) => m.times.map((t) => ({ key: `${m.id}@${t}`, time: t, med: m })))
+    .sort((a, b) => a.time.localeCompare(b.time));
+  const taken = state.medLog[todayIso] ?? [];
+  const toggleDose = (key: string) =>
+    update((p) => ({
+      ...p,
+      medLog: { ...p.medLog, [todayIso]: taken.includes(key) ? taken.filter((k) => k !== key) : [...taken, key] },
+    }));
   const entries = careEntries(profile, state.done, today, state.skipped);
   const due = entries.filter((e) => e.status === "due");
   const soon = entries.filter((e) => e.status === "soon");
@@ -53,19 +68,19 @@ export default function Today({ state, profile, today, go }: ViewProps) {
             type="button"
             onClick={() => go("kalender")}
             className={`flex flex-col items-center rounded-2xl border py-2.5 ${
-              i === 0 ? "border-forest bg-forest text-white" : "border-line bg-card"
+              i === 0 ? "border-forest bg-forest text-onaccent" : "border-line bg-card"
             }`}
           >
-            <span className={`text-[11px] font-medium uppercase ${i === 0 ? "text-white/70" : "text-muted"}`}>
+            <span className={`text-[11px] font-medium uppercase ${i === 0 ? "text-onaccent/70" : "text-muted"}`}>
               {d.toLocaleDateString("de-DE", { weekday: "short" }).slice(0, 2)}
             </span>
             <span className="font-display text-xl leading-tight">{d.getDate()}</span>
-            <span className={`mt-0.5 size-1.5 rounded-full ${apptDays.has(iso(d)) ? (i === 0 ? "bg-white" : "bg-coral") : "bg-transparent"}`} />
+            <span className={`mt-0.5 size-1.5 rounded-full ${apptDays.has(iso(d)) ? (i === 0 ? "bg-field" : "bg-coral") : "bg-transparent"}`} />
           </button>
         ))}
       </div>
 
-      {!state.reminders.enabled && (
+      {!app.reminders.enabled && (
         <button
           type="button"
           onClick={() => go("profil")}
@@ -87,22 +102,22 @@ export default function Today({ state, profile, today, go }: ViewProps) {
         <button
           type="button"
           onClick={() => go("vorsorge")}
-          className="relative overflow-hidden rounded-3xl bg-forest p-6 text-left text-white md:col-span-3"
+          className="relative overflow-hidden rounded-3xl bg-hero p-6 text-left text-hero-fg md:col-span-3"
         >
-          <span className="absolute -right-10 -top-10 size-44 rounded-full bg-white/5" />
-          <span className="absolute -bottom-16 right-10 size-40 rounded-full bg-white/5" />
-          <span className="text-sm font-medium text-white/70">Deine Vorsorge</span>
+          <span className="absolute -right-10 -top-10 size-44 rounded-full bg-hero-fg/5" />
+          <span className="absolute -bottom-16 right-10 size-40 rounded-full bg-hero-fg/5" />
+          <span className="text-sm font-medium text-hero-fg/70">Deine Vorsorge</span>
           <span className="mt-3 flex items-end gap-4">
             <span className="font-display text-7xl leading-none">{due.length}</span>
             <span className="pb-1.5 text-lg leading-snug">
               {due.length === 1 ? "Untersuchung" : "Untersuchungen"}
               <br />
-              <span className="text-white/70">offen oder fällig</span>
+              <span className="text-hero-fg/70">offen oder fällig</span>
             </span>
           </span>
           <span className="mt-5 flex flex-wrap gap-2 text-sm">
-            <span className="rounded-full bg-white/12 px-3 py-1">{soon.length} demnächst</span>
-            <span className="rounded-full bg-white/12 px-3 py-1">
+            <span className="rounded-full bg-hero-fg/12 px-3 py-1">{soon.length} demnächst</span>
+            <span className="rounded-full bg-hero-fg/12 px-3 py-1">
               {entries.filter((e) => e.status === "ok" || e.status === "done").length} im Plan
             </span>
             <span className="ml-auto inline-flex items-center gap-1 font-semibold">
@@ -161,7 +176,7 @@ export default function Today({ state, profile, today, go }: ViewProps) {
           </SectionTitle>
           <div className="space-y-2">
             {upcoming.map((a) => (
-              <div key={a.id} className="flex items-center gap-3.5 rounded-2xl border border-line bg-card p-3.5">
+              <button key={a.id} type="button" onClick={() => setVisitId(a.id)} className="flex w-full items-center gap-3.5 rounded-2xl border border-line bg-card p-3.5 text-left transition-colors hover:border-forest/40">
                 <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-coral-soft text-center leading-none text-coral">
                   <span>
                     <span className="font-display block text-lg">{parse(a.date).getDate()}</span>
@@ -178,12 +193,44 @@ export default function Today({ state, profile, today, go }: ViewProps) {
                     {a.note && ` · ${a.note}`}
                   </span>
                 </span>
-              </div>
+              </button>
             ))}
             {!upcoming.length && (
               <Card><p className="text-muted">Keine Termine eingetragen.</p></Card>
             )}
           </div>
+
+          {doses.length > 0 && (
+            <>
+              <SectionTitle aside={<button type="button" className="underline underline-offset-4" onClick={() => go("medikamente")}>Plan</button>}>
+                Medikamente heute
+              </SectionTitle>
+              <div className="space-y-2">
+                {doses.map((d) => {
+                  const on = taken.includes(d.key);
+                  return (
+                    <button
+                      key={d.key}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => toggleDose(d.key)}
+                      className="flex w-full items-center gap-3.5 rounded-2xl border border-line bg-card p-3.5 text-left"
+                    >
+                      <span className={`grid size-11 shrink-0 place-items-center rounded-xl ${on ? "bg-forest text-onaccent" : "bg-sage text-forest"}`}>
+                        <Icon name={on ? "check" : "pill"} />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className={`block truncate font-semibold ${on ? "text-muted line-through" : ""}`}>{d.med.name}</span>
+                        <span className="block truncate text-sm text-muted">
+                          {d.time} Uhr{d.med.dose && ` · ${d.med.dose}`}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
 
           {rec && (
             <>
@@ -201,6 +248,7 @@ export default function Today({ state, profile, today, go }: ViewProps) {
       </div>
 
       {open && <CareSheet entry={open} today={today} onClose={() => setOpen(null)} />}
+      {visit && <VisitSheet appointment={visit} doctors={app.doctors} onClose={() => setVisitId(null)} />}
     </div>
   );
 }

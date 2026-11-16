@@ -32,7 +32,7 @@ export default function CycleRing({ info, size = 200 }: { info: CycleInfo; size?
         cx={100 + r * Math.cos(angle)}
         cy={100 + r * Math.sin(angle)}
         r="10"
-        fill="#fffdf8"
+        fill="var(--card)"
         stroke={phaseColors[info.phase]}
         strokeWidth="5"
       />

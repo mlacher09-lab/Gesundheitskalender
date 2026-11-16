@@ -89,8 +89,8 @@ export function cycleMarks(
 }
 
 export const phaseColors: Record<CyclePhase, string> = {
-  menstruation: "#a8456b",
-  follikel: "#e6b8c6",
-  ovulation: "#23796e",
-  luteal: "#d9c9a8",
+  menstruation: "var(--plum)",
+  follikel: "var(--phase-follikel)",
+  ovulation: "var(--teal)",
+  luteal: "var(--phase-luteal)",
 };

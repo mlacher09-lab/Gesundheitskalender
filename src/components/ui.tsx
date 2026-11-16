@@ -75,6 +75,48 @@ const paths: Record<string, ReactNode> = {
       <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.600 5.600 7 7M17 17l1.400 1.400M18.400 5.600 17 7M7 17l-1.400 1.400" />
     </>
   ),
+  syringe: <path d="m18 3 3 3M19.5 4.5l-4 4M14 7l3 3-8.5 8.5H5.500v-3L14 7ZM5.500 18.500 3 21M9.500 11.500l1.500 1.500M12 9l1.500 1.500" />,
+  pill: (
+    <>
+      <rect x="2.500" y="8.500" width="19" height="7" rx="3.500" transform="rotate(-45 12 12)" />
+      <path d="m9.500 9.500 5 5" />
+    </>
+  ),
+  chart: <path d="M4 20V5M4 20h16M7.500 15l3.500-4 3 2.500 5-6.500" />,
+  star: <path d="m12 3.500 2.600 5.300 5.900.900-4.250 4.100 1 5.800L12 16.800l-5.250 2.800 1-5.800L3.500 9.700l5.900-.900L12 3.500Z" />,
+  globe: (
+    <>
+      <circle cx="12" cy="12" r="8.500" />
+      <path d="M3.500 12h17M12 3.500c2.500 2.500 3.500 5.300 3.500 8.500s-1 6-3.500 8.500c-2.500-2.500-3.500-5.300-3.500-8.500s1-6 3.500-8.500Z" />
+    </>
+  ),
+  grid: (
+    <>
+      <rect x="4" y="4" width="6.500" height="6.500" rx="1.800" />
+      <rect x="13.500" y="4" width="6.500" height="6.500" rx="1.800" />
+      <rect x="4" y="13.500" width="6.500" height="6.500" rx="1.800" />
+      <rect x="13.500" y="13.500" width="6.500" height="6.500" rx="1.800" />
+    </>
+  ),
+  settings: (
+    <>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 3v2.500M12 18.500V21M3 12h2.500M18.500 12H21M5.600 5.600l1.800 1.800M16.600 16.600l1.800 1.800M18.400 5.600l-1.800 1.800M7.400 16.600l-1.800 1.800" />
+    </>
+  ),
+  users: (
+    <>
+      <circle cx="9" cy="8.500" r="3.300" />
+      <path d="M2.500 19.500c.700-3.300 3.300-5 6.500-5s5.800 1.700 6.500 5M16 5.500a3.300 3.300 0 0 1 0 6.200M18 14.800c1.900.600 3.100 2.200 3.500 4.700" />
+    </>
+  ),
+  trash: <path d="M4.500 7h15M9.500 7V4.500h5V7M6.500 7l.800 12.500h9.400L17.500 7M10 10.500v6M14 10.500v6" />,
+  note: (
+    <>
+      <path d="M6 3.500h9l3.500 3.500v13.500H6V3.500Z" />
+      <path d="M9 11h6M9 14.500h6M9 7.500h3" />
+    </>
+  ),
   bell: (
     <>
       <path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15l1.5-2Z" />
@@ -154,7 +196,7 @@ export function Chip({
       aria-pressed={active}
       className={`shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
         active
-          ? "border-forest bg-forest text-white"
+          ? "border-forest bg-forest text-onaccent"
           : "border-line bg-card text-ink hover:border-forest/40"
       }`}
     >
@@ -179,7 +221,7 @@ export function Button({
   className?: string;
 }) {
   const styles = {
-    primary: "bg-forest text-white hover:bg-forest-deep",
+    primary: "bg-forest text-onaccent hover:bg-forest-deep",
     ghost: "border border-line bg-card text-ink hover:border-forest/40",
     danger: "border border-coral/30 bg-coral-soft text-coral",
   }[variant];

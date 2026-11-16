@@ -15,7 +15,12 @@ export const metadata: Metadata = {
     "Vorsorge, Impfungen, Zyklus und Gesundheitsempfehlungen – an einem Ort.",
 };
 
-export const viewport: Viewport = { themeColor: "#f4f1ea" };
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f4f1ea" },
+    { media: "(prefers-color-scheme: dark)", color: "#111715" },
+  ],
+};
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

@@ -4,33 +4,119 @@
   --font-sans: var(--font-geist-sans);
   --font-display: var(--font-fraunces);
 
-  --color-paper: #f4f1ea;
-  --color-card: #fffdf8;
-  --color-ink: #1b2b27;
-  --color-muted: #6b7770;
-  --color-line: #e3ded2;
-  --color-forest: #1f4d43;
-  --color-forest-deep: #153832;
-  --color-sage: #dce7df;
-  --color-coral: #d9552f;
-  --color-coral-soft: #fbe6dd;
-  --color-plum: #a8456b;
-  --color-plum-soft: #f5e1e8;
-  --color-sun: #b9820f;
-  --color-sun-soft: #fbf0d4;
-  --color-sky: #2f6f9b;
-  --color-sky-soft: #ddebf3;
-  --color-teal: #23796e;
-  --color-teal-soft: #d9efec;
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-field: var(--field);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-forest: var(--forest);
+  --color-forest-deep: var(--forest-deep);
+  --color-onaccent: var(--onaccent);
+  --color-hero: var(--hero);
+  --color-hero-fg: var(--hero-fg);
+  --color-sage: var(--sage);
+  --color-coral: var(--coral);
+  --color-coral-soft: var(--coral-soft);
+  --color-plum: var(--plum);
+  --color-plum-soft: var(--plum-soft);
+  --color-sun: var(--sun);
+  --color-sun-soft: var(--sun-soft);
+  --color-sky: var(--sky);
+  --color-sky-soft: var(--sky-soft);
+  --color-teal: var(--teal);
+  --color-teal-soft: var(--teal-soft);
 }
 
 :root {
   color-scheme: light;
+  --paper: #f4f1ea;
+  --card: #fffdf8;
+  --field: #ffffff;
+  --ink: #1b2b27;
+  --muted: #6b7770;
+  --line: #e3ded2;
+  --forest: #1f4d43;
+  --forest-deep: #153832;
+  --onaccent: #ffffff;
+  --hero: #1f4d43;
+  --hero-fg: #ffffff;
+  --sage: #dce7df;
+  --coral: #d9552f;
+  --coral-soft: #fbe6dd;
+  --plum: #a8456b;
+  --plum-soft: #f5e1e8;
+  --sun: #b9820f;
+  --sun-soft: #fbf0d4;
+  --sky: #2f6f9b;
+  --sky-soft: #ddebf3;
+  --teal: #23796e;
+  --teal-soft: #d9efec;
+  --phase-follikel: #e6b8c6;
+  --phase-luteal: #d9c9a8;
+}
+
+/* Dunkles Design: automatisch nach Systemeinstellung, oder fest über data-theme */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #111715;
+    --card: #19211e;
+    --field: #202a27;
+    --ink: #e9eeea;
+    --muted: #9aa8a1;
+    --line: #2c3834;
+    --forest: #7fc8b4;
+    --forest-deep: #9ad6c4;
+    --onaccent: #0f1a17;
+    --hero: #1c463d;
+    --hero-fg: #f1f6f3;
+    --sage: #20332d;
+    --coral: #f08f6c;
+    --coral-soft: #3a241c;
+    --plum: #e293b3;
+    --plum-soft: #38222c;
+    --sun: #e5b750;
+    --sun-soft: #342a10;
+    --sky: #84badf;
+    --sky-soft: #1b2d39;
+    --teal: #6fc7b9;
+    --teal-soft: #173430;
+    --phase-follikel: #7a4a5c;
+    --phase-luteal: #6b6048;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #111715;
+  --card: #19211e;
+  --field: #202a27;
+  --ink: #e9eeea;
+  --muted: #9aa8a1;
+  --line: #2c3834;
+  --forest: #7fc8b4;
+  --forest-deep: #9ad6c4;
+  --onaccent: #0f1a17;
+  --hero: #1c463d;
+  --hero-fg: #f1f6f3;
+  --sage: #20332d;
+  --coral: #f08f6c;
+  --coral-soft: #3a241c;
+  --plum: #e293b3;
+  --plum-soft: #38222c;
+  --sun: #e5b750;
+  --sun-soft: #342a10;
+  --sky: #84badf;
+  --sky-soft: #1b2d39;
+  --teal: #6fc7b9;
+  --teal-soft: #173430;
+  --phase-follikel: #7a4a5c;
+  --phase-luteal: #6b6048;
 }
 
 body {
-  background: var(--color-paper);
-  color: var(--color-ink);
+  background: var(--paper);
+  color: var(--ink);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
@@ -53,16 +139,16 @@ body {
   .rise, .sheet-in { animation: none; }
 }
 
-input[type="date"], input[type="time"], input[type="text"], input[type="number"], select {
-  background: #fff;
-  border: 1px solid var(--color-line);
+input[type="date"], input[type="time"], input[type="text"], input[type="number"], input[type="tel"], input[type="url"], select, textarea {
+  background: var(--field);
+  border: 1px solid var(--line);
   border-radius: 12px;
   padding: 10px 12px;
   width: 100%;
   font-size: 16px;
-  color: var(--color-ink);
+  color: var(--ink);
 }
-input:focus-visible, select:focus-visible, button:focus-visible {
-  outline: 2px solid var(--color-forest);
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--forest);
   outline-offset: 2px;
 }
