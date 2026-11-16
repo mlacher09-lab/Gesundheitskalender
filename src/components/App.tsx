@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { startPwa } from "@/lib/pwa";
+import { buildReminders, syncReminders } from "@/lib/reminders";
 import { useStore } from "@/lib/store";
 import { Icon } from "./ui";
 import Onboarding from "./Onboarding";
@@ -39,6 +41,7 @@ function Brand() {
 
 export default function App() {
   const state = useStore();
+  useEffect(startPwa, []);
   // Auf dem Server ist der Zustand null – die eigentliche App rendert nur im Browser.
   if (!state) return <div className="min-h-dvh bg-paper" />;
   if (!state.profile) return <Onboarding />;
@@ -48,6 +51,11 @@ export default function App() {
 function Shell({ state, profile }: Pick<ViewProps, "state" | "profile">) {
   const [tab, setTab] = useState<Tab>("heute");
   const [today] = useState(() => new Date());
+
+  // Erinnerungen bei jeder Änderung für den Service Worker bereitstellen
+  useEffect(() => {
+    syncReminders(buildReminders(state, today));
+  }, [state, today]);
   const visible = tabs.filter((t) => t.id !== "zyklus" || profile.cycleEnabled);
   const current = tab === "zyklus" && !profile.cycleEnabled ? "heute" : tab;
   const props = { state, profile, today, go: setTab };

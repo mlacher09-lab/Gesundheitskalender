@@ -35,5 +35,6 @@ export function demoState(today: Date): State {
     ],
     symptoms: { [iso(addDays(today, -9))]: ["Krämpfe", "Müde"] },
     periodDays,
+    reminders: { enabled: false, leadDays: 1, cycle: false, discreet: false },
   };
 }

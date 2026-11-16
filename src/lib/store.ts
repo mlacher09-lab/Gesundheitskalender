@@ -22,6 +22,16 @@ export interface Appointment {
   itemId?: string; // verknüpfte Vorsorge
 }
 
+export interface ReminderSettings {
+  enabled: boolean;
+  /** Tage Vorlauf vor einem Termin */
+  leadDays: number;
+  /** auch an die voraussichtliche Periode erinnern */
+  cycle: boolean;
+  /** Benachrichtigungen ohne Details anzeigen (Sperrbildschirm) */
+  discreet: boolean;
+}
+
 export interface State {
   profile: Profile | null;
   /** Vorsorge-ID → Datum, an dem sie zuletzt erledigt wurde */
@@ -31,6 +41,7 @@ export interface State {
   appointments: Appointment[];
   periodDays: string[];
   symptoms: Record<string, string[]>;
+  reminders: ReminderSettings;
 }
 
 const KEY = "gesundheitskalender-v1";
@@ -42,6 +53,7 @@ const empty: State = {
   appointments: [],
   periodDays: [],
   symptoms: {},
+  reminders: { enabled: false, leadDays: 1, cycle: false, discreet: false },
 };
 
 let state: State | null = null;

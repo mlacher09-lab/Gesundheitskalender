@@ -109,7 +109,14 @@ export function CareSheet({
         <p className="mt-3 rounded-2xl bg-sun-soft p-3.5 text-sm leading-relaxed">{item.note}</p>
       )}
       <p className="mt-3 text-xs text-muted">
-        Quelle: {item.source}
+        Quelle:{" "}
+        {item.sourceUrl ? (
+          <a href={item.sourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">
+            {item.source}
+          </a>
+        ) : (
+          item.source
+        )}
         {entry.lastDone && ` · zuletzt am ${fmtMed(parse(entry.lastDone))}`}
       </p>
 

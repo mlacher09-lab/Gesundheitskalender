@@ -65,6 +65,23 @@ export default function Today({ state, profile, today, go }: ViewProps) {
         ))}
       </div>
 
+      {!state.reminders.enabled && (
+        <button
+          type="button"
+          onClick={() => go("profil")}
+          className="mt-4 flex w-full items-center gap-3 rounded-2xl border border-line bg-card px-4 py-3 text-left text-[15px]"
+        >
+          <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-sun-soft text-sun">
+            <Icon name="bell" size={18} />
+          </span>
+          <span className="flex-1">
+            <strong className="font-semibold">Erinnerungen einschalten</strong>
+            <span className="block text-sm text-muted">Damit du keinen Termin und keine Vorsorge verpasst</span>
+          </span>
+          <Icon name="right" size={16} className="text-muted" />
+        </button>
+      )}
+
       <div className="mt-6 grid gap-4 md:grid-cols-5">
         {/* Vorsorge-Status */}
         <button

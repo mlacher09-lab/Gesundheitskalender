@@ -75,6 +75,18 @@ const paths: Record<string, ReactNode> = {
       <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.600 5.600 7 7M17 17l1.400 1.400M18.400 5.600 17 7M7 17l-1.400 1.400" />
     </>
   ),
+  bell: (
+    <>
+      <path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15l1.5-2Z" />
+      <path d="M10 21h4" />
+    </>
+  ),
+  phone: (
+    <>
+      <rect x="7" y="3" width="10" height="18" rx="2.500" />
+      <path d="M11 18h2" />
+    </>
+  ),
   lock: (
     <>
       <rect x="5" y="10.500" width="14" height="10" rx="2.500" />

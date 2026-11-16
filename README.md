@@ -7,7 +7,10 @@ Vorsorge, Impfungen, Zyklus und Gesundheitsempfehlungen in einem Kalender.
 - **Empfehlungen** – Bewegung, Ernährung, Schlaf, Mental nach Alter (`src/data/empfehlungen.ts`)
 - **Datenschutz** – alle Daten liegen ausschließlich im `localStorage` des Browsers
 
-> Die medizinischen Inhalte in `src/data/` sind ein erster Entwurf und noch **nicht gegen die Primärquellen (G-BA, STIKO, DGE, WHO) geprüft**.
+- **Installierbar (PWA)** – Manifest, Icons und Service Worker (`public/sw.js`) für Offline-Nutzung
+- **Erinnerungen** – lokale Benachrichtigungen ohne Server (`src/lib/reminders.ts`) und Kalender-Export als `.ics` (`src/lib/ics.ts`)
+
+> Stand der medizinischen Inhalte in `src/data/`: Impfungen sind gegen den STIKO-Impfkalender 2026 abgeglichen (anhand von Suchergebnissen, nicht der Originaldokumente). Die Prüfung von `vorsorge.ts` und `empfehlungen.ts` ist begonnen, aber **nicht abgeschlossen**.
 
 ## Entwicklung
 
