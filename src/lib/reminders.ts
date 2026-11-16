@@ -1,7 +1,7 @@
 import { careEntries } from "./care";
 import { cycleInfo } from "./cycle";
 import { addDays, fmtLong, iso, parse } from "./date";
-import type { State } from "./store";
+import type { AppState, Person, ReminderSettings } from "./store";
 
 export interface Reminder {
   /** eindeutig – jede Erinnerung wird nur einmal angezeigt */
@@ -12,10 +12,30 @@ export interface Reminder {
   body: string;
 }
 
-/** Leitet aus dem aktuellen Stand alle anstehenden Erinnerungen ab. */
-export function buildReminders(state: State, today: Date): Reminder[] {
-  const { profile, reminders: settings } = state;
-  if (!profile || !settings.enabled) return [];
+/** Leitet aus dem aktuellen Stand alle anstehenden Erinnerungen ab – für alle Personen. */
+export function buildReminders(app: AppState, today: Date): Reminder[] {
+  const settings = app.reminders;
+  if (!settings.enabled) return [];
+  const many = app.people.length > 1;
+  const out = app.people.flatMap((person) => {
+    const who = many && person.profile.name ? `${person.profile.name}: ` : "";
+    return personReminders(person, settings, today).map((r) => ({
+      ...r,
+      key: `${person.id}:${r.key}`,
+      title: who + r.title,
+    }));
+  });
+  if (settings.discreet)
+    return out.map((r) => ({
+      ...r,
+      title: "Gesundheitskalender",
+      body: "Du hast eine neue Erinnerung.",
+    }));
+  return out;
+}
+
+function personReminders(state: Person, settings: ReminderSettings, today: Date): Reminder[] {
+  const { profile } = state;
   const todayIso = iso(today);
   const out: Reminder[] = [];
 
@@ -60,6 +80,21 @@ export function buildReminders(state: State, today: Date): Reminder[] {
     }
   }
 
+  // Tägliche Erinnerung an den Medikamentenplan (heute und morgen vorgemerkt)
+  for (const d of [0, 1]) {
+    const day = iso(addDays(today, d));
+    const doses = state.meds
+      .filter((m) => m.active && (!m.until || m.until >= day))
+      .reduce((n, m) => n + m.times.length, 0);
+    if (doses > 0)
+      out.push({
+        key: `meds:${day}`,
+        date: day,
+        title: doses === 1 ? "Heute: 1 Medikamenten-Einnahme" : `Heute: ${doses} Medikamenten-Einnahmen`,
+        body: "Öffne den Medikamentenplan zum Abhaken.",
+      });
+  }
+
   if (settings.cycle && profile.cycleEnabled) {
     const info = cycleInfo(state.periodDays, profile, today);
     if (info && !info.late) {
@@ -71,13 +106,6 @@ export function buildReminders(state: State, today: Date): Reminder[] {
       });
     }
   }
-
-  if (settings.discreet)
-    return out.map((r) => ({
-      ...r,
-      title: "Gesundheitskalender",
-      body: "Du hast eine neue Erinnerung.",
-    }));
   return out;
 }
 

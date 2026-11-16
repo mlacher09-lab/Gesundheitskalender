@@ -1,14 +1,14 @@
 import { careEntries } from "./care";
 import { addDays, addYears, iso, parse } from "./date";
-import type { State } from "./store";
+import type { Person } from "./store";
 
 const esc = (s: string) =>
   s.replace(/\\/g, "\\\\").replace(/([,;])/g, "\\$1").replace(/\n/g, "\\n");
 const day = (s: string) => s.replace(/-/g, "");
 
 /** Kalenderdatei (.ics) mit Terminen und kommenden Vorsorgen – importierbar in jede Kalender-App. */
-export function buildICS(state: State, today: Date): string {
-  const lead = Math.max(0, state.reminders.leadDays);
+export function buildICS(state: Person, today: Date, leadDays = 1): string {
+  const lead = Math.max(0, leadDays);
   const stamp = `${day(iso(today))}T000000Z`;
   const lines = [
     "BEGIN:VCALENDAR",
@@ -46,15 +46,37 @@ export function buildICS(state: State, today: Date): string {
   for (const a of state.appointments) {
     if (a.date >= todayIso) event(`appt-${a.id}`, a.date, a.title, a.note ?? "", a.time);
   }
-  if (state.profile) {
-    const horizon = addYears(today, 3);
-    for (const e of careEntries(state.profile, state.done, today, state.skipped)) {
-      if (!e.dueDate || e.dueDate < today || e.dueDate > horizon) continue;
-      event(
-        `care-${e.item.id}-${iso(e.dueDate)}`,
-        iso(e.dueDate),
-        `Vorsorge fällig: ${e.item.title}`,
-        `${e.item.doctor}. ${e.item.description}`,
+  const horizon = addYears(today, 3);
+  for (const e of careEntries(state.profile, state.done, today, state.skipped)) {
+    if (!e.dueDate || e.dueDate < today || e.dueDate > horizon) continue;
+    event(
+      `care-${e.item.id}-${iso(e.dueDate)}`,
+      iso(e.dueDate),
+      `Vorsorge fällig: ${e.item.title}`,
+      `${e.item.doctor}. ${e.item.description}`,
+    );
+  }
+  // Medikamente: täglich wiederkehrend zur Einnahmezeit, mit Alarm
+  for (const m of state.meds) {
+    if (!m.active || (m.until && m.until < todayIso)) continue;
+    for (const t of m.times) {
+      const [h, min] = t.split(":").map(Number);
+      const end = h * 60 + min + 10;
+      lines.push(
+        "BEGIN:VEVENT",
+        `UID:med-${m.id}-${t.replace(":", "")}@gesundheitskalender`,
+        `DTSTAMP:${stamp}`,
+        `DTSTART:${day(todayIso)}T${pad(h)}${pad(min)}00`,
+        `DTEND:${day(todayIso)}T${pad(Math.min(Math.floor(end / 60), 23))}${pad(end % 60)}00`,
+        `RRULE:FREQ=DAILY${m.until ? `;UNTIL=${day(m.until)}T235900` : ""}`,
+        `SUMMARY:${esc(`${m.name}${m.dose ? ` – ${m.dose}` : ""}`)}`,
+        ...(m.note ? [`DESCRIPTION:${esc(m.note)}`] : []),
+        "BEGIN:VALARM",
+        "ACTION:DISPLAY",
+        `DESCRIPTION:${esc(m.name)}`,
+        "TRIGGER:PT0M",
+        "END:VALARM",
+        "END:VEVENT",
       );
     }
   }
@@ -66,8 +88,8 @@ function pad(n: number) {
   return String(n).padStart(2, "0");
 }
 
-export function downloadICS(state: State, today: Date) {
-  const blob = new Blob([buildICS(state, today)], { type: "text/calendar;charset=utf-8" });
+export function downloadICS(state: Person, today: Date, leadDays = 1) {
+  const blob = new Blob([buildICS(state, today, leadDays)], { type: "text/calendar;charset=utf-8" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "gesundheitskalender.ics";

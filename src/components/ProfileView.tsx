@@ -4,18 +4,21 @@ import { useState } from "react";
 import { downloadICS } from "@/lib/ics";
 import { isIos, isStandalone, promptInstall, useCanInstall } from "@/lib/pwa";
 import { requestReminderPermission } from "@/lib/reminders";
-import { resetAll, update, type Profile, type ReminderSettings, type Sex } from "@/lib/store";
+import { riskInfo, type RiskKey } from "@/data/risiko";
+import { removePerson, resetAll, update, updateApp, type Profile, type ReminderSettings, type RiskFactors, type Sex, type Smoker, type Theme } from "@/lib/store";
 import type { ViewProps } from "./App";
 import { Button, Card, Field, Icon, SectionTitle } from "./ui";
 
-export default function ProfileView({ state, profile, today }: ViewProps) {
+export default function ProfileView({ app, state, profile, today }: ViewProps) {
   const canInstall = useCanInstall();
   const [installed] = useState(isStandalone);
   const [ios] = useState(isIos);
   const [notice, setNotice] = useState("");
-  const rem = state.reminders;
+  const rem = app.reminders;
   const setRem = (patch: Partial<ReminderSettings>) =>
-    update((s) => ({ ...s, reminders: { ...s.reminders, ...patch } }));
+    updateApp((s) => ({ ...s, reminders: { ...s.reminders, ...patch } }));
+  const setRisk = (patch: Partial<RiskFactors>) => set({ risk: { ...profile.risk, ...patch } });
+  const flags: Exclude<RiskKey, "smoker">[] = ["chronic", "familyColon", "familyBreast", "fsmeArea", "pregnant"];
 
   const toggleReminders = async (on: boolean) => {
     setNotice("");
@@ -32,10 +35,10 @@ export default function ProfileView({ state, profile, today }: ViewProps) {
   };
 
   const set = (patch: Partial<Profile>) =>
-    update((s) => ({ ...s, profile: { ...s.profile!, ...patch } }));
+    update((s) => ({ ...s, profile: { ...s.profile, ...patch } }));
 
   const exportData = () => {
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify(app, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "gesundheitskalender.json";
@@ -61,6 +64,56 @@ export default function ProfileView({ state, profile, today }: ViewProps) {
             <option value="all">Alle anzeigen</option>
           </select>
         </Field>
+      </Card>
+
+      <SectionTitle aside="passt den Vorsorgeplan an">Persönliche Risikofaktoren</SectionTitle>
+      <Card className="space-y-4">
+        <Field label={riskInfo.smoker.label}>
+          <select value={profile.risk.smoker} onChange={(e) => setRisk({ smoker: e.target.value as Smoker })}>
+            <option value="never">Nein</option>
+            <option value="current">Ja, ich rauche</option>
+            <option value="former">Früher, heute nicht mehr</option>
+          </select>
+        </Field>
+        {flags
+          .filter((k) => k !== "pregnant" || profile.sex !== "male")
+          .map((k) => (
+            <label key={k} className="flex cursor-pointer items-center justify-between gap-4">
+              <span className="text-[15px]">
+                {riskInfo[k].label}
+                <span className="block text-sm text-muted">{riskInfo[k].hint}</span>
+              </span>
+              <input type="checkbox" checked={profile.risk[k]} onChange={(e) => setRisk({ [k]: e.target.checked })} className="size-6 shrink-0 accent-forest" />
+            </label>
+          ))}
+        <p className="text-sm leading-relaxed text-muted">
+          Die Angaben blenden zusätzliche Untersuchungen und Impfungen im Vorsorgeplan ein. Sie bleiben wie alles andere nur auf diesem Gerät.
+        </p>
+      </Card>
+
+      <SectionTitle>Design</SectionTitle>
+      <Card>
+        <div className="grid grid-cols-3 gap-2" role="group" aria-label="Design">
+          {(
+            [
+              ["system", "Automatisch"],
+              ["light", "Hell"],
+              ["dark", "Dunkel"],
+            ] as [Theme, string][]
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={app.theme === id}
+              onClick={() => updateApp((s) => ({ ...s, theme: id }))}
+              className={`min-h-11 rounded-xl border text-sm font-medium transition-colors ${
+                app.theme === id ? "border-forest bg-forest text-onaccent" : "border-line bg-field"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </Card>
 
       <SectionTitle>App aufs Handy</SectionTitle>
@@ -138,7 +191,7 @@ export default function ProfileView({ state, profile, today }: ViewProps) {
             </p>
           </>
         )}
-        <Button variant="ghost" onClick={() => downloadICS(state, today)}>
+        <Button variant="ghost" onClick={() => downloadICS(state, today, rem.leadDays)}>
           <Icon name="calendar" size={18} /> In Kalender-App übertragen (.ics)
         </Button>
       </Card>
@@ -183,10 +236,20 @@ export default function ProfileView({ state, profile, today }: ViewProps) {
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Button variant="ghost" onClick={exportData}>Daten exportieren</Button>
+          {app.people.length > 1 && (
+            <Button
+              variant="danger"
+              onClick={() => {
+                if (confirm(`Wirklich alle Daten von ${profile.name || "dieser Person"} löschen?`)) removePerson(state.id);
+              }}
+            >
+              {profile.name || "Diese Person"} entfernen
+            </Button>
+          )}
           <Button
             variant="danger"
             onClick={() => {
-              if (confirm("Wirklich alle Daten auf diesem Gerät löschen?")) resetAll();
+              if (confirm("Wirklich alle Daten aller Personen auf diesem Gerät löschen?")) resetAll();
             }}
           >
             Alles löschen

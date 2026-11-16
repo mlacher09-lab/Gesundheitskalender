@@ -4,16 +4,19 @@ import { useState } from "react";
 import { careEntries } from "@/lib/care";
 import { cycleInfo, cycleMarks } from "@/lib/cycle";
 import { addDays, fmtLong, fmtMonth, iso } from "@/lib/date";
-import { uid, update } from "@/lib/store";
+import { uid, update, type Doctor } from "@/lib/store";
 import type { ViewProps } from "./App";
+import VisitSheet from "./VisitSheet";
 import { Button, Field, Icon, Sheet } from "./ui";
 
 const weekdays = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 
-export default function CalendarView({ state, profile, today }: ViewProps) {
+export default function CalendarView({ app, state, profile, today }: ViewProps) {
   const [month, setMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
   const [selected, setSelected] = useState(iso(today));
   const [adding, setAdding] = useState(false);
+  const [visitId, setVisitId] = useState<string | null>(null);
+  const visit = state.appointments.find((a) => a.id === visitId);
 
   const info = profile.cycleEnabled ? cycleInfo(state.periodDays, profile, today) : null;
   const marks = profile.cycleEnabled ? cycleMarks(state.periodDays, info) : new Map();
@@ -72,7 +75,7 @@ export default function CalendarView({ state, profile, today }: ViewProps) {
                 const isToday = k === iso(today);
                 const isSel = k === selected;
                 const bg =
-                  mark === "period" ? "bg-plum text-white"
+                  mark === "period" ? "bg-plum text-onaccent"
                   : mark === "predicted" ? "border border-dashed border-plum/60 text-plum"
                   : mark === "ovulation" ? "bg-teal-soft text-teal"
                   : mark === "fertile" ? "bg-teal-soft/50"
@@ -87,7 +90,7 @@ export default function CalendarView({ state, profile, today }: ViewProps) {
                   >
                     {d.getDate()}
                     <span className="absolute bottom-1.5 flex gap-0.5">
-                      {appts.has(k) && <span className={`size-1.5 rounded-full ${mark === "period" ? "bg-white" : "bg-coral"}`} />}
+                      {appts.has(k) && <span className={`size-1.5 rounded-full ${mark === "period" ? "bg-field" : "bg-coral"}`} />}
                       {careDue.has(k) && <span className="size-1.5 rounded-full bg-sun" />}
                     </span>
                   </button>
@@ -114,12 +117,16 @@ export default function CalendarView({ state, profile, today }: ViewProps) {
             {selAppts.map((a) => (
               <div key={a.id} className="flex items-start gap-3 rounded-2xl border border-line bg-card p-3.5">
                 <span className="mt-1.5 size-2.5 shrink-0 rounded-full bg-coral" />
-                <span className="min-w-0 flex-1">
+                <button type="button" onClick={() => setVisitId(a.id)} className="min-w-0 flex-1 text-left">
                   <span className="block font-semibold">{a.title}</span>
                   <span className="block text-sm text-muted">
                     {a.time ? `${a.time} Uhr` : "ganztägig"}{a.note && ` · ${a.note}`}
                   </span>
-                </span>
+                  <span className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-forest">
+                    <Icon name="note" size={14} />
+                    {a.questions?.length || a.bring?.length || a.after ? "Vorbereitung ansehen" : "Termin vorbereiten"}
+                  </span>
+                </button>
                 <button
                   type="button"
                   aria-label={`${a.title} löschen`}
@@ -157,12 +164,14 @@ export default function CalendarView({ state, profile, today }: ViewProps) {
         </div>
       </div>
 
-      {adding && <AddSheet date={selected} onClose={() => setAdding(false)} />}
+      {adding && <AddSheet date={selected} doctors={app.doctors} onClose={() => setAdding(false)} />}
+      {visit && <VisitSheet appointment={visit} doctors={app.doctors} onClose={() => setVisitId(null)} />}
     </div>
   );
 }
 
-function AddSheet({ date, onClose }: { date: string; onClose: () => void }) {
+function AddSheet({ date, doctors, onClose }: { date: string; doctors: Doctor[]; onClose: () => void }) {
+  const [doctorId, setDoctorId] = useState("");
   const [title, setTitle] = useState("");
   const [d, setD] = useState(date);
   const [time, setTime] = useState("");
@@ -172,7 +181,7 @@ function AddSheet({ date, onClose }: { date: string; onClose: () => void }) {
     if (!title.trim() || !d) return;
     update((s) => ({
       ...s,
-      appointments: [...s.appointments, { id: uid(), title: title.trim(), date: d, time: time || undefined, note: note.trim() || undefined }],
+      appointments: [...s.appointments, { id: uid(), title: title.trim(), date: d, time: time || undefined, note: note.trim() || undefined, doctorId: doctorId || undefined }],
     }));
     onClose();
   };
@@ -186,6 +195,25 @@ function AddSheet({ date, onClose }: { date: string; onClose: () => void }) {
           <Field label="Datum"><input type="date" required value={d} onChange={(e) => setD(e.target.value)} /></Field>
           <Field label="Uhrzeit"><input type="time" value={time} onChange={(e) => setTime(e.target.value)} /></Field>
         </div>
+        {doctors.length > 0 && (
+          <Field label="Praxis (optional)">
+            <select
+              value={doctorId}
+              onChange={(e) => {
+                setDoctorId(e.target.value);
+                const d = doctors.find((x) => x.id === e.target.value);
+                if (d && !title.trim()) setTitle(d.specialty);
+              }}
+            >
+              <option value="">Keine ausgewählt</option>
+              {doctors.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name} ({d.specialty})
+                </option>
+              ))}
+            </select>
+          </Field>
+        )}
         <Field label="Notiz (optional)">
           <input type="text" placeholder="z. B. Impfpass mitnehmen" value={note} onChange={(e) => setNote(e.target.value)} />
         </Field>
