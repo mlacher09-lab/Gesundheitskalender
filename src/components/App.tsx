@@ -13,6 +13,7 @@ import CycleView from "./CycleView";
 import RecsView from "./RecsView";
 import ProfileView from "./ProfileView";
 import VaccineView from "./VaccineView";
+import ActivityView from "./ActivityView";
 import MedsView from "./MedsView";
 import MeasurementsView from "./MeasurementsView";
 import BonusView from "./BonusView";
@@ -27,6 +28,7 @@ export type Tab =
   | "vorsorge"
   | "zyklus"
   | "tipps"
+  | "bewegung"
   | "impfpass"
   | "medikamente"
   | "messwerte"
@@ -52,6 +54,7 @@ export const mainTabs: TabInfo[] = [
 ];
 
 export const moreTabs: TabInfo[] = [
+  { id: "bewegung", label: "Bewegung", icon: "run", hint: "Wochenziel und Aktivitäten nach WHO-Empfehlung" },
   { id: "impfpass", label: "Impfpass", icon: "syringe", hint: "Impfungen mit Datum und nächster Auffrischung" },
   { id: "medikamente", label: "Medikamente", icon: "pill", hint: "Einnahmeplan und tägliche Checkliste" },
   { id: "messwerte", label: "Messwerte", icon: "chart", hint: "Blutdruck, Gewicht, Laborwerte im Verlauf" },
@@ -193,6 +196,7 @@ function Shell({ app, state, profile }: Pick<ViewProps, "app" | "state" | "profi
           {current === "vorsorge" && <CareView {...props} />}
           {current === "zyklus" && <CycleView {...props} />}
           {current === "tipps" && <RecsView {...props} />}
+          {current === "bewegung" && <ActivityView state={state} today={today} />}
           {current === "impfpass" && <VaccineView {...props} />}
           {current === "medikamente" && <MedsView state={state} today={today} />}
           {current === "messwerte" && <MeasurementsView state={state} today={today} />}

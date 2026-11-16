@@ -18,7 +18,8 @@ export default function CalendarView({ app, state, profile, today }: ViewProps) 
   const [visitId, setVisitId] = useState<string | null>(null);
   const visit = state.appointments.find((a) => a.id === visitId);
 
-  const info = profile.cycleEnabled ? cycleInfo(state.periodDays, profile, today) : null;
+  const predict = profile.cycleEnabled && (profile.cycleMode ?? "standard") !== "schwangerschaft" && profile.cycleMode !== "wechseljahre";
+  const info = predict ? cycleInfo(state.periodDays, profile, today) : null;
   const marks = profile.cycleEnabled ? cycleMarks(state.periodDays, info) : new Map();
 
   const careDue = new Map<string, string[]>();

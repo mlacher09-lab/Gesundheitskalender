@@ -152,3 +152,19 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
   outline: 2px solid var(--forest);
   outline-offset: 2px;
 }
+
+/* Druck / „Als PDF speichern“: nur der Bericht, immer hell */
+@media print {
+  :root, :root[data-theme="dark"], :root:not([data-theme="light"]) {
+    color-scheme: light;
+    --paper: #ffffff; --card: #ffffff; --field: #ffffff; --ink: #111111; --muted: #555555; --line: #cccccc;
+    --forest: #1f4d43; --onaccent: #ffffff; --sage: #e6eee9; --plum: #a8456b; --plum-soft: #f5e1e8;
+    --teal: #23796e; --phase-follikel: #e6b8c6; --phase-luteal: #d9c9a8;
+  }
+  /* Der Bericht hängt direkt am body; alles andere wird nicht gedruckt */
+  body > *:not(.print-area) { display: none !important; }
+  .print-area { position: static !important; overflow: visible !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .no-print { display: none !important; }
+  @page { margin: 16mm; }
+}

@@ -5,7 +5,9 @@ import { cyclePhaseTips, recommendations } from "@/data/empfehlungen";
 import { careEntries, type CareEntry } from "@/lib/care";
 import { cycleInfo } from "@/lib/cycle";
 import { addDays, ageAt, diffDays, fmtLong, fmtShort, iso, parse, relative } from "@/lib/date";
+import { pregnancyInfo } from "@/lib/pregnancy";
 import { update } from "@/lib/store";
+import { weekSummary } from "./ActivityView";
 import type { ViewProps } from "./App";
 import { CareRow, CareSheet } from "./CareParts";
 import CycleRing from "./CycleRing";
@@ -32,7 +34,10 @@ export default function Today({ app, state, profile, today, go }: ViewProps) {
   const due = entries.filter((e) => e.status === "due");
   const soon = entries.filter((e) => e.status === "soon");
   const age = ageAt(parse(profile.birthDate), today);
-  const info = profile.cycleEnabled ? cycleInfo(state.periodDays, profile, today) : null;
+  const mode = profile.cycleMode ?? "standard";
+  const info = profile.cycleEnabled && mode !== "schwangerschaft" && mode !== "wechseljahre" ? cycleInfo(state.periodDays, profile, today) : null;
+  const preg = profile.cycleEnabled && mode === "schwangerschaft" && profile.dueDate ? pregnancyInfo(profile.dueDate, today) : null;
+  const week = age >= 5 ? weekSummary(state, today) : null;
 
   const upcoming = state.appointments
     .filter((a) => a.date >= iso(today))
@@ -49,7 +54,7 @@ export default function Today({ app, state, profile, today, go }: ViewProps) {
 
   const hour = today.getHours();
   const greeting = hour < 11 ? "Guten Morgen" : hour < 18 ? "Hallo" : "Guten Abend";
-  const week = Array.from({ length: 7 }, (_, i) => addDays(today, i));
+  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(today, i));
   const apptDays = new Set(state.appointments.map((a) => a.date));
 
   return (
@@ -62,7 +67,7 @@ export default function Today({ app, state, profile, today, go }: ViewProps) {
 
       {/* Wochenleiste */}
       <div className="mt-6 grid grid-cols-7 gap-1.5">
-        {week.map((d, i) => (
+        {weekDays.map((d, i) => (
           <button
             key={i}
             type="button"
@@ -144,6 +149,16 @@ export default function Today({ app, state, profile, today, go }: ViewProps) {
               </span>
             </span>
           </button>
+        ) : preg ? (
+          <button type="button" onClick={() => go("zyklus")} className="rounded-3xl border border-line bg-card p-5 text-left md:col-span-2">
+            <span className="text-sm font-medium text-plum">{preg.trimester}. Schwangerschaftsdrittel</span>
+            <span className="font-display mt-1 block text-5xl">
+              {preg.week}+{preg.day}
+            </span>
+            <span className="mt-1 block text-sm text-muted">
+              Schwangerschaftswoche · Termin {fmtShort(preg.due)}
+            </span>
+          </button>
         ) : (
           <Card className="md:col-span-2">
             <p className="text-sm font-medium text-muted">Dein Alter</p>
@@ -199,6 +214,28 @@ export default function Today({ app, state, profile, today, go }: ViewProps) {
               <Card><p className="text-muted">Keine Termine eingetragen.</p></Card>
             )}
           </div>
+
+          {week && (
+            <>
+              <SectionTitle aside={<button type="button" className="underline underline-offset-4" onClick={() => go("bewegung")}>Eintragen</button>}>
+                Bewegung diese Woche
+              </SectionTitle>
+              <button type="button" onClick={() => go("bewegung")} className="block w-full rounded-2xl border border-line bg-card p-4 text-left">
+                <span className="flex items-baseline justify-between gap-3">
+                  <span>
+                    <span className="font-display text-3xl">{week.minutes}</span>
+                    <span className="text-muted"> von {week.goal} Min.</span>
+                  </span>
+                  <span className="text-sm text-muted">
+                    Kräftigung {Math.min(week.strengthDays, week.strengthGoal)}/{week.strengthGoal}
+                  </span>
+                </span>
+                <span className="mt-3 block h-2.5 overflow-hidden rounded-full bg-sage">
+                  <span className="block h-full rounded-full bg-forest" style={{ width: `${Math.min(100, (week.minutes / week.goal) * 100)}%` }} />
+                </span>
+              </button>
+            </>
+          )}
 
           {doses.length > 0 && (
             <>

@@ -23,6 +23,25 @@ export interface Profile {
   cycleLength: number;
   periodLength: number;
   risk: RiskFactors;
+  /** Ausrichtung der Zyklusansicht */
+  cycleMode?: CycleMode;
+  /** Schwangerschaft: errechneter Entbindungstermin (YYYY-MM-DD) */
+  dueDate?: string;
+  /** Wochenziel Bewegung in Minuten (moderat); Standard 150 */
+  activityGoal?: number;
+}
+
+export type CycleMode = "standard" | "kinderwunsch" | "schwangerschaft" | "wechseljahre";
+
+export interface Activity {
+  id: string;
+  date: string;
+  minutes: number;
+  intensity: "moderat" | "intensiv";
+  /** z. B. "Radfahren" */
+  kind: string;
+  /** zählt als muskelkräftigende Einheit */
+  strength?: boolean;
 }
 
 export interface Question {
@@ -125,6 +144,7 @@ export interface Person {
   medLog: Record<string, string[]>;
   measurements: Measurement[];
   bonus: BonusEntry[];
+  activities: Activity[];
 }
 
 export type Theme = "system" | "light" | "dark";
@@ -169,6 +189,7 @@ export function newPerson(profile: Omit<Profile, "risk"> & { risk?: RiskFactors 
     medLog: {},
     measurements: [],
     bonus: [],
+    activities: [],
   };
 }
 

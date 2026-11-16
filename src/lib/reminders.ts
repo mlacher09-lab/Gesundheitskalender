@@ -95,7 +95,7 @@ function personReminders(state: Person, settings: ReminderSettings, today: Date)
       });
   }
 
-  if (settings.cycle && profile.cycleEnabled) {
+  if (settings.cycle && profile.cycleEnabled && (profile.cycleMode ?? "standard") !== "schwangerschaft" && profile.cycleMode !== "wechseljahre") {
     const info = cycleInfo(state.periodDays, profile, today);
     if (info && !info.late) {
       out.push({

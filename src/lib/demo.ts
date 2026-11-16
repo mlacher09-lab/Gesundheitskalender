@@ -72,6 +72,16 @@ export function demoState(today: Date): AppState {
     ],
     medLog: { [d(0)]: ["m1@07:00"], [d(-1)]: ["m1@07:00", "m2@12:30"], [d(-2)]: ["m1@07:00"] },
     measurements: [...bp, ...weight, { id: "l1", type: "lab" as const, date: d(-400), value: 118, label: "LDL-Cholesterin", unit: "mg/dl" }],
+    activities: [
+      { id: "a0", date: d(0), minutes: 25, intensity: "moderat" as const, kind: "Gehen" },
+      { id: "a1", date: d(-1), minutes: 45, intensity: "moderat" as const, kind: "Radfahren" },
+      { id: "a2", date: d(-2), minutes: 30, intensity: "intensiv" as const, kind: "Laufen" },
+      { id: "a3", date: d(-3), minutes: 40, intensity: "moderat" as const, kind: "Krafttraining", strength: true },
+      { id: "a4", date: d(-8), minutes: 60, intensity: "moderat" as const, kind: "Wandern" },
+      { id: "a5", date: d(-10), minutes: 35, intensity: "moderat" as const, kind: "Krafttraining", strength: true },
+      { id: "a6", date: d(-12), minutes: 50, intensity: "intensiv" as const, kind: "Schwimmen" },
+      { id: "a7", date: d(-16), minutes: 90, intensity: "moderat" as const, kind: "Radfahren" },
+    ],
     bonus: [0, 1, 2, 3].map((y) => ({
       id: `b${y}`,
       program: "zahn" as const,

@@ -13,6 +13,8 @@ Vorsorge, Impfungen, Zyklus und Gesundheitsempfehlungen in einem Kalender.
 - **Medikamentenplan**, **Messwerte-Tagebuch** (Blutdruck, Gewicht, Labor mit Verlauf), **Bonusheft**
 - **Praxen** und **Terminvorbereitung** (Fragen, Mitbringen, Notizen danach)
 - **Reiseimpfungen** nach Zielland (`src/data/reise.ts`, aus den STIKO/DTG-Ländertabellen des RKI, Epid. Bull. 27/2026)
+- **Zyklus-Modi** für Kinderwunsch, Schwangerschaft (Termine nach G-BA Mutterschafts-Richtlinie) und Wechseljahre; druckbare Zyklus-Auswertung
+- **Bewegung** – Wochenziel nach WHO-Empfehlung mit Aktivitäten-Tagebuch
 - **Dunkles Design** – automatisch oder fest wählbar
 - **Installierbar (PWA)** – Manifest, Icons und Service Worker (`public/sw.js`) für Offline-Nutzung
 - **Erinnerungen** – lokale Benachrichtigungen ohne Server (`src/lib/reminders.ts`) und Kalender-Export als `.ics` (`src/lib/ics.ts`)
