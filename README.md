@@ -10,7 +10,7 @@ Vorsorge, Impfungen, Zyklus und Gesundheitsempfehlungen in einem Kalender.
 - **Installierbar (PWA)** – Manifest, Icons und Service Worker (`public/sw.js`) für Offline-Nutzung
 - **Erinnerungen** – lokale Benachrichtigungen ohne Server (`src/lib/reminders.ts`) und Kalender-Export als `.ics` (`src/lib/ics.ts`)
 
-> Stand der medizinischen Inhalte in `src/data/`: Impfungen sind gegen den STIKO-Impfkalender 2026 abgeglichen (anhand von Suchergebnissen, nicht der Originaldokumente). Die Prüfung von `vorsorge.ts` und `empfehlungen.ts` ist begonnen, aber **nicht abgeschlossen**.
+> Stand der medizinischen Inhalte in `src/data/` (November 2026): Alle Einträge wurden per Websuche mit STIKO-, G-BA-, WHO- und DGE-Angaben abgeglichen – allerdings nur anhand von Suchergebnis-Zusammenfassungen, **nicht anhand der Originaldokumente**. Die `sourceUrl`-Links wurden nicht einzeln geöffnet. Vor einem öffentlichen Einsatz ist eine fachliche Prüfung nötig.
 
 ## Entwicklung
 
